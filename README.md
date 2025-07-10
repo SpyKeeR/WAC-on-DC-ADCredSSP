@@ -22,3 +22,10 @@ Once it is done, you can try WAC on DC!
 - Automatically creates the group in Active Directory.
 - Adds the current user to the newly created group.
 - Adds a helper script to automate the WAC patch process using the provided functions.
+
+## License
+
+This project is based on [WAC-on-DC](https://github.com/shiroinekotfs/WAC-on-DC), licensed under the MIT License.
+Modifications and additions by [SpyKeeR](https://github.com/SpyKeeR).
+
+See the [LICENSE](./LICENSE) file for more details.
