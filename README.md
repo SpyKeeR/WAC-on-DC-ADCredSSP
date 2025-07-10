@@ -1,4 +1,4 @@
-> A wannabe Microsoft MVP -> [@shiroinekotfs](https://github.com/shiroinekotfs)
+> Forked from the repository of a wannabe Microsoft MVP -> [@shiroinekotfs](https://github.com/shiroinekotfs)
 
 # Windows Admin Center on Domain Controller
 
@@ -11,17 +11,14 @@ You, first, install Windows Admin Center (Preview). If you don't have, [download
 Once downloaded and installed (please ignore all warnings and errors), move your Powershell current directory into this repo folder, and try this command:
 
 ```powershell
-Import-Module .\Microsoft.WindowsAdminCenter.Configuration.psm1
-Enable-WACPSRemoting
-Register-WACLocalCredSSP
+powershell -ExecutionPolicy Bypass -File .\Fix-WAC-on-DC-InstallScript.ps1
 ```
+> **⚠️ Note:** Make sure to run the script as a user with permissions to create groups in Active Directory.
 
 Once it is done, you can try WAC on DC!
 
-## Patched previous versions
-
-Old Windows Admin Center with patched for installation on Domain Controller can be access from [here](https://github.com/shiroinekotfs/WAC-on-DC/tree/master/.previous-version).
-
-> Note
->
-> Please download both `.cab` and `.msi` with it.
+## Fork update
+- Fixes the creation of the Windows Admin Center CredSSP group.
+- Automatically creates the group in Active Directory.
+- Adds the current user to the newly created group.
+- Adds a helper script to automate the WAC patch process using the provided functions.
