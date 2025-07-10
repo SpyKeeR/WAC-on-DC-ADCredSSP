@@ -17,7 +17,7 @@ powershell -ExecutionPolicy Bypass -File .\Fix-WAC-on-DC-InstallScript.ps1
 
 Once it is done, you can try WAC on DC!
 
-## Fork update
+## Fork updates
 - Fixes the creation of the Windows Admin Center CredSSP group.
 - Automatically creates the group in Active Directory.
 - Adds the current user to the newly created group.
