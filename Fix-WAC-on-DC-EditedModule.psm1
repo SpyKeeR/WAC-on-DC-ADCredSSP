@@ -4296,9 +4296,11 @@ function Unregister-WACLocalCredSSP {
     try {
         $configuration = Get-PSSessionConfiguration -Name $ConstCredSspName
         Unregister-PSSessionConfiguration -Name $configuration.Name
+	# Search for an existing Active Directory CredSSP Group 
         $group = Get-ADGroup -Filter "Name -eq '$ConstCredSspGroupName'" -ErrorAction SilentlyContinue
         if ($group) {
-            Remove-ADGroup -Identity $group.DistinguishedName -Confirm:$false
+            # Remove the CredSSP AD group if it exists, for cleanup purposes.
+	    Remove-ADGroup -Identity $group.DistinguishedName -Confirm:$false
         }
 
         $credSspPath = GetCredSspPath
@@ -4350,19 +4352,22 @@ function Register-WACLocalCredSSP {
     )
 
     try {
-        # 0 create or recreate domain group
+      	# Step 0: Ensure the domain group is freshly created for CredSSP.
         $group = Get-ADGroup -Filter "Name -eq '$ConstCredSspGroupName'" -ErrorAction SilentlyContinue
         if ($group) {
-            Remove-ADGroup -Identity $group.DistinguishedName -Confirm:$false
+            # Remove any previous version of the CredSSP group to avoid conflicts.
+	    Remove-ADGroup -Identity $group.DistinguishedName -Confirm:$false
         }
-
+	# Create a new AD security group dedicated to CredSSP access.
         New-ADGroup -Name $ConstCredSspGroupName -SamAccountName $ConstCredSspGroupName `
                     -GroupScope Global -GroupCategory Security -Path "CN=Users,DC=maxime14,DC=domaine,DC=tssr" `
                     -Description $ConstCredSspGroupDescription
-
+	
         $user = [System.Security.Principal.WindowsIdentity]::GetCurrent()
-		$usernameOnly = $user.Name.Split('\')[1]
-        Add-ADGroupMember -Identity $ConstCredSspGroupName -Members $usernameOnly
+	# Extract the username part from DOMAIN\Username format
+ 	$usernameOnly = $user.Name.Split('\')[1]
+      	# Add the current user to the newly created AD group.
+	Add-ADGroupMember -Identity $ConstCredSspGroupName -Members $usernameOnly
 
         # 1 remove old one if exists.
         $existing = Get-PSSessionConfiguration -Name $ConstCredSspName -ErrorAction SilentlyContinue
@@ -4423,6 +4428,7 @@ function Register-WACLocalCredSSP {
 
         # 4 define endpoint settings.
         $psscPath = [System.IO.Path]::GetTempFileName().Replace(".tmp", ".pssc")
+	# Generate the current domain name dynamically for accurate AD group reference.
         $domainName = ([System.DirectoryServices.ActiveDirectory.Domain]::GetCurrentDomain()).Name
         $networkService = (new-object System.Security.Principal.SecurityIdentifier([System.Security.Principal.WellKnownSidType]::NetworkServiceSid, $null)).Translate([System.Security.Principal.NTAccount])
         $configuration = @{
